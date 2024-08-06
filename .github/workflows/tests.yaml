@@ -19,5 +19,42 @@ jobs:
             - recursive: true
               args: [--frozen-lockfile, --strict-peer-dependencies]
 
-      - name: Unit test all packages
-        run: pnpm test -r
+      - name: watch-test-1.ts -- Test to ensure that tsx in watch mode restarts node when the source code changes
+        run: |
+          output_file=/tmp/266-watch-test-1-output.txt
+          nohup pnpm tsx --watch ./src/watch-test-1.ts $output_file &
+          for i in {1..16}
+          do
+            echo "iteration ${i} $(tail -n1 $output_file)"
+            touch ./src/watch-test-1.ts
+            sleep 0.8
+          done
+          cat $output_file
+          pkill node
+          unique_lines=$(uniq $output_file | wc -l)
+          if [ $unique_lines -ne 16 ]; then
+            echo "⚠️ There were not 16 unique lines in the output file. There were only ${unique_lines} lines. This suggests that tsx did not reload when the source changed."
+            exit 1
+          else
+            exit 0
+          fi
+
+      - name: watch-test-2.ts -- Test to ensure that tsx in watch mode runs the most up-to-date code when the source changes
+        run: |
+          output_file=/tmp/266-watch-test-2-output.txt
+          nohup pnpm tsx --watch ./src/watch-test-2.ts $output_file &
+          for i in {1..16}
+          do
+            echo "iteration ${i} $(grep 'uniqueString =' ./src/watch-test-2.ts)"
+            sed -i "s/output-${i}/output-$((i+1))/" ./src/watch-test-2.ts
+            sleep 0.8
+          done
+          cat $output_file
+          pkill node
+          unique_lines=$(uniq $output_file | wc -l)
+          if [ $unique_lines -ne 16 ]; then
+            echo "⚠️ There were not 16 unique lines in the output file. There were only ${unique_lines} lines. This suggests that tsx did not reload when the source changed."
+            exit 1
+          else
+            exit 0
+          fi

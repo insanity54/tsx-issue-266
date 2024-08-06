@@ -1,0 +1,15 @@
+services:
+  tsx-issue-266:
+    image: tsx-issue-266
+    build:
+      context: .
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: package.json
+          target: /app

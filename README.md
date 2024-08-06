@@ -7,6 +7,7 @@ See https://github.com/privatenumber/tsx/issues/266
 ## Tests
 
 `./src/watch-test-1.ts` ensures that tsx is reloading when the source code is touched. tsx seems reliable in this scenario.
+
 `./src/watch-test-2.ts` ensures that tsx is using the new code. tsx seems unreliable in this scenario.
 
 

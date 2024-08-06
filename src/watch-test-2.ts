@@ -18,6 +18,7 @@ console.log(`outputting to ${outputFile}`)
 const uniqueString = 'output-1'
 
 async function main() {
+    // console.log('try changing this console.log() inside a docker container and see if tsx will reload and display the new text') // uncomment this for ad-hoc testing
     return appendFile(outputFile, uniqueString+'\n', { encoding: 'utf-8' })
 }
 
